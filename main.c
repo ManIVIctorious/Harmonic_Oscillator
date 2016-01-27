@@ -110,7 +110,7 @@ int main(int argc, char **argv){
     int i;
     double pi, hbar, avogadro, amu, x;
     double omega, term1, term2, term3, arg, eval; 
-    double H1, H2, H3, H4, H5;
+    double H0, H1, H2, H3, H4, H5;
     double psi0, psi1, psi2, psi3, psi4, psi5;
     FILE *fd = fopen(outputfile, "w");
 
@@ -180,12 +180,12 @@ int main(int argc, char **argv){
         arg = term2*x;
         
         // H(n,x) = (-1)^n * e^(x^2) * d^n/dx^n e^(-x^2)
-        // H0 = 1;
-        H1 =  2*arg;
-        H2 =  4*arg*arg       -   2;
-        H3 =  8*arg*arg*arg     -  12*arg;
-        H4 = 16*arg*arg*arg*arg   -  48*arg*arg   +  12;
-        H5 = 32*arg*arg*arg*arg*arg - 160*arg*arg*arg + 120*arg;
+        H0 = 1;
+        H1 = 2*arg;
+        H2 = 2*arg*H1 - 2*1*H0;
+        H3 = 2*arg*H2 - 2*2*H1;
+        H4 = 2*arg*H3 - 2*3*H2;
+        H5 = 2*arg*H4 - 2*4*H3;
 
         psi0 = term1 * exp(term3*x*x);
         psi1 = term1 * 1.0/sqrt(pow(2,1) * 1)   * H1 * exp(term3*x*x);
@@ -194,7 +194,7 @@ int main(int argc, char **argv){
         psi4 = term1 * 1.0/sqrt(pow(2,4) * 24)  * H4 * exp(term3*x*x);
         psi5 = term1 * 1.0/sqrt(pow(2,5) * 120) * H5 * exp(term3*x*x);
 
-        fprintf(fd, "% 8.8lf\t", x);
+        fprintf(fd,"% 8.8lf\t", x);
         fprintf(fd, "%8.8lf \t", 0.5*k*x*x);
         fprintf(fd, "%8.8lf \t", psi0 + (0.5  )*eval);
         fprintf(fd, "%8.8lf \t", psi1 + (0.5+1)*eval);
