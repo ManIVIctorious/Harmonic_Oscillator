@@ -198,7 +198,11 @@ int main(int argc, char **argv){
         }
 
         fprintf(fd,  "% 8.8lf\t", x);
-        fprintf(fd, "% 19.8lf\t", 0.5*k*x*x);
+        if(kcal_flag == 1){
+            fprintf(fd, "% 19.8lf\t", 0.5*k*x*x/4.184);
+        }else{
+            fprintf(fd, "% 19.8lf\t", 0.5*k*x*x);
+        }
         for(i=0; i<numberofeigenstates; ++i){
             fprintf(fd, "%15.8lf\t", psi[i] + (0.5+(double)i)*eval);
         }
