@@ -4,10 +4,11 @@
 #include <math.h>
 #include <getopt.h>
 
+int factorial(int n);
+
 int main(int argc, char **argv){
 
     // dynamic variables
-    // OH Wert für k: 4587,756
     double xmin   =   -2.5;   // minimal x-value, set with -a or --xmin
     double xmax   =    2.5;   // maximal x-value, set with -b or --xmax
     double dx     =    0.025; // stepsize of x,   set with -d or --x-spacing
@@ -15,6 +16,7 @@ int main(int argc, char **argv){
     double mu     =    1.0;   // reduced mass of involved particles in g/mol, set with -m or --reduced-mass
     char *outputfile = "/dev/stdout";
     static int kcal_flag = 0; // set flag to kcal/mol
+    int numberofeigenstates=6;
 
     int c;
     while(1){
@@ -110,8 +112,11 @@ int main(int argc, char **argv){
     int i;
     double pi, hbar, avogadro, amu, x;
     double omega, term1, term2, term3, arg, eval; 
-    double H0, H1, H2, H3, H4, H5;
+
+    //double H0, H1, H2, H3, H4, H5;
     double psi0, psi1, psi2, psi3, psi4, psi5;
+    double H[numberofeigenstates];
+    //double psi[numberofeigenstates];
     FILE *fd = fopen(outputfile, "w");
 
     // constants
@@ -155,7 +160,7 @@ int main(int argc, char **argv){
     fprintf(fd, "#exponent:         %+18.12e 1/angstrom^2\n", term3);
 
     fprintf(fd, "#energy:\n");
-    for(i=0; i<6; ++i){
+    for(i=0; i<numberofeigenstates; ++i){
         if(kcal_flag == 1){
             fprintf(fd, "#\tE%2d = %18.12lf kcal/mol\n", i, (0.5+i)*eval);
         }
@@ -164,7 +169,7 @@ int main(int argc, char **argv){
         }
     }
 
-    // Calculate E*Psi and output data
+    // Calculate E+Psi and output data
     //fprintf(fd, "# x\tV(x)\tE0+Psi0\tE1+Psi1\tE2+Psi2\tE3+Psi3\tE4+Psi4\tE5+Psi5\n");
     fprintf(fd, "#  x\t\t");
     fprintf(fd, "V(x)\t\t");
@@ -180,19 +185,21 @@ int main(int argc, char **argv){
         arg = term2*x;
         
         // H(n,x) = (-1)^n * e^(x^2) * d^n/dx^n e^(-x^2)
-        H0 = 1;
-        H1 = 2*arg;
-        H2 = 2*arg*H1 - 2*1*H0;
-        H3 = 2*arg*H2 - 2*2*H1;
-        H4 = 2*arg*H3 - 2*3*H2;
-        H5 = 2*arg*H4 - 2*4*H3;
+        H[0] = 1;
+        H[1] = 2*arg;
+        for(i=2; i<numberofeigenstates; ++i){
+            H[i] = 2.0*arg*H[i-1] - 2.0*((double)i - 1.0)*H[i-2];
+        }
+        //H3 = 2*arg*H2 - 2*2*H1;
+        //H4 = 2*arg*H3 - 2*3*H2;
+        //H5 = 2*arg*H4 - 2*4*H3;
 
         psi0 = term1 * exp(term3*x*x);
-        psi1 = term1 * 1.0/sqrt(pow(2,1) * 1)   * H1 * exp(term3*x*x);
-        psi2 = term1 * 1.0/sqrt(pow(2,2) * 2)   * H2 * exp(term3*x*x);
-        psi3 = term1 * 1.0/sqrt(pow(2,3) * 6)   * H3 * exp(term3*x*x);
-        psi4 = term1 * 1.0/sqrt(pow(2,4) * 24)  * H4 * exp(term3*x*x);
-        psi5 = term1 * 1.0/sqrt(pow(2,5) * 120) * H5 * exp(term3*x*x);
+        psi1 = term1 * 1.0/sqrt(pow(2,1) * 1)   * H[1] * exp(term3*x*x);
+        psi2 = term1 * 1.0/sqrt(pow(2,2) * 2)   * H[2] * exp(term3*x*x);
+        psi3 = term1 * 1.0/sqrt(pow(2,3) * 6)   * H[3] * exp(term3*x*x);
+        psi4 = term1 * 1.0/sqrt(pow(2,4) * 24)  * H[4] * exp(term3*x*x);
+        psi5 = term1 * 1.0/sqrt(pow(2,5) * (double)factorial(5)) * H[5] * exp(term3*x*x);
 
         fprintf(fd,"% 8.8lf\t", x);
         fprintf(fd, "%8.8lf \t", 0.5*k*x*x);
@@ -207,4 +214,14 @@ int main(int argc, char **argv){
     fclose(fd);
 
     return 0;
+}
+
+int factorial(int n){
+    int fact = 1;
+
+    while(n > 1){
+        fact = fact * n;
+        n = n - 1;
+    }
+    return fact;
 }
