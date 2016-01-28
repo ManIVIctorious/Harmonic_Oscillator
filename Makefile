@@ -7,9 +7,9 @@ CFLAGS = -g03 -Wall -Werror -Wstrict-prototypes -Wmissing-prototypes -mtune=nati
 EXE = HarmonicOscillator.bin
 # Objektdateien (.o bzw. .out), Librarys und Abhängigkeiten
 # (wenn Abhängigkeit geändert -> make wird neu ausgeführt)
-OBJ1 = main.o
+OBJ1 = HarmonicOscillator.o
 LIB1 = -lm `pkg-config --cflags --libs gsl` #../include/differential.c
-DEP1 = main.c Makefile #../include/header.h 
+DEP1 = HarmonicOscillator.c Makefile #../include/header.h 
 # Kommandoblock "all:" als Einsprungspunkt für make
 all: $(EXE)
 #

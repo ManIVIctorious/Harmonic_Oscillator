@@ -176,7 +176,7 @@ int main(int argc, char **argv){
     }
 
     // Calculate E+Psi and output data
-    //fprintf(fd, "# x\tV(x)\tE0+Psi0\tE1+Psi1\tE2+Psi2\tE3+Psi3\tE4+Psi4\tE5+Psi5\n");
+    //fprintf(fd, "# x\tV(x)\tE0+Psi0\tE1+Psi1...\tEn+Psin\n");
     fprintf(fd, "#  x\t\t");
     fprintf(fd, " V(x)\t\t\t");
     for(i=0; i<numberofeigenstates; ++i){
