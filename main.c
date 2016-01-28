@@ -26,18 +26,19 @@ int main(int argc, char **argv){
             /* These options don’t set a flag.
                We distinguish them by their indices. */
             {"help",                  no_argument, 0, 'h'},
-            {"xmin",            required_argument, 0, 'a'},
-            {"xmax",            required_argument, 0, 'b'},
-            {"x-spacing",       required_argument, 0, 'd'},
-            {"force-constant",  required_argument, 0, 'k'},
-            {"reduced-mass",    required_argument, 0, 'm'},
-            {"output-file",     required_argument, 0, 'o'},
+            {"xmin",                  required_argument, 0, 'a'},
+            {"xmax",                  required_argument, 0, 'b'},
+            {"x-spacing",             required_argument, 0, 'd'},
+            {"force-constant",        required_argument, 0, 'k'},
+            {"reduced-mass",          required_argument, 0, 'm'},
+            {"output-file",           required_argument, 0, 'o'},
+            {"number-of-eigenstates", required_argument, 0, 'n'},
             {0, 0, 0, 0}
         };
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "a:b:d:k:m:o:h", long_options, &option_index);
+        c = getopt_long (argc, argv, "a:b:d:k:m:o:n:h", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -66,16 +67,19 @@ int main(int argc, char **argv){
                 printf("[--reduced-mass|-m <value>]");
                 printf("[--output-file|-o]");
                 printf("[--kcal]");
+                printf("\n\t\t\t");
+                printf("[--number-of-eigenstates|-n]");
                 printf("\n\n");
                 
-                printf("-h, --help\t\tShow this help dialogue\n");
-                printf("-a, --xmin\t\tSet minimum x-value\n");
-                printf("-b, --xmax\t\tSet maximum x-value\n");
-                printf("-d, --x-spacing\t\tSet spacing between x-values\n");
-                printf("-k, --force-constant\tSet force constant in kJ/(mol*angstrom^2)\n");
-                printf("-m, --reduced-mass\tSet reduced mass of involved particles in g/mol\n");
-                printf("-o, --output-file\tName of output file\n");
-                printf("    --kcal\t\tOutput in kcal/mol\n");
+                printf("-h, --help\t\t\tShow this help dialogue\n");
+                printf("-a, --xmin\t\t\tSet minimum x-value\n");
+                printf("-b, --xmax\t\t\tSet maximum x-value\n");
+                printf("-d, --x-spacing\t\t\tSet spacing between x-values\n");
+                printf("-k, --force-constant\t\tSet force constant in kJ/(mol*angstrom^2)\n");
+                printf("-m, --reduced-mass\t\tSet reduced mass of involved particles in g/mol\n");
+                printf("-o, --output-file\t\tName of output file\n");
+                printf("-n, --number-of-eigenstates\tNumber of calculated eigenstates\n");
+                printf("    --kcal\t\t\tOutput in kcal/mol\n");
                 printf("\n");
                 exit (0);
 
@@ -104,6 +108,10 @@ int main(int argc, char **argv){
                 outputfile = optarg;
                 break;
 
+            case 'n':
+                numberofeigenstates = atoi(optarg);
+                break;
+
             default:
                 abort();
         }
@@ -113,10 +121,8 @@ int main(int argc, char **argv){
     double pi, hbar, avogadro, amu, x;
     double omega, term1, term2, term3, arg, eval; 
 
-    //double H0, H1, H2, H3, H4, H5;
-    double psi0, psi1, psi2, psi3, psi4, psi5;
     double H[numberofeigenstates];
-    //double psi[numberofeigenstates];
+    double psi[numberofeigenstates];
     FILE *fd = fopen(outputfile, "w");
 
     // constants
@@ -172,13 +178,10 @@ int main(int argc, char **argv){
     // Calculate E+Psi and output data
     //fprintf(fd, "# x\tV(x)\tE0+Psi0\tE1+Psi1\tE2+Psi2\tE3+Psi3\tE4+Psi4\tE5+Psi5\n");
     fprintf(fd, "#  x\t\t");
-    fprintf(fd, "V(x)\t\t");
-    fprintf(fd, "E0+Psi0\t\t");
-    fprintf(fd, "E1+Psi1\t\t");
-    fprintf(fd, "E2+Psi2\t\t");
-    fprintf(fd, "E3+Psi3\t\t");
-    fprintf(fd, "E4+Psi4\t\t");
-    fprintf(fd, "E5+Psi5\t\t");
+    fprintf(fd, " V(x)\t\t\t");
+    for(i=0; i<numberofeigenstates; ++i){
+        fprintf(fd, " E%d+Psi%d\t", i,i);
+    }
     fprintf(fd, "\n");
     for(x = xmin; x <= xmax; x += dx){
 
@@ -190,25 +193,15 @@ int main(int argc, char **argv){
         for(i=2; i<numberofeigenstates; ++i){
             H[i] = 2.0*arg*H[i-1] - 2.0*((double)i - 1.0)*H[i-2];
         }
-        //H3 = 2*arg*H2 - 2*2*H1;
-        //H4 = 2*arg*H3 - 2*3*H2;
-        //H5 = 2*arg*H4 - 2*4*H3;
+        for(i=0; i<numberofeigenstates; ++i){
+            psi[i] = term1 * 1.0/sqrt(pow(2,i) * (double)factorial(i)) * H[i] * exp(term3*x*x);
+        }
 
-        psi0 = term1 * exp(term3*x*x);
-        psi1 = term1 * 1.0/sqrt(pow(2,1) * 1)   * H[1] * exp(term3*x*x);
-        psi2 = term1 * 1.0/sqrt(pow(2,2) * 2)   * H[2] * exp(term3*x*x);
-        psi3 = term1 * 1.0/sqrt(pow(2,3) * 6)   * H[3] * exp(term3*x*x);
-        psi4 = term1 * 1.0/sqrt(pow(2,4) * 24)  * H[4] * exp(term3*x*x);
-        psi5 = term1 * 1.0/sqrt(pow(2,5) * (double)factorial(5)) * H[5] * exp(term3*x*x);
-
-        fprintf(fd,"% 8.8lf\t", x);
-        fprintf(fd, "%8.8lf \t", 0.5*k*x*x);
-        fprintf(fd, "%8.8lf \t", psi0 + (0.5  )*eval);
-        fprintf(fd, "%8.8lf \t", psi1 + (0.5+1)*eval);
-        fprintf(fd, "%8.8lf \t", psi2 + (0.5+2)*eval);
-        fprintf(fd, "%8.8lf \t", psi3 + (0.5+3)*eval);
-        fprintf(fd, "%8.8lf \t", psi4 + (0.5+4)*eval);
-        fprintf(fd, "%8.8lf \t", psi5 + (0.5+5)*eval);
+        fprintf(fd,  "% 8.8lf\t", x);
+        fprintf(fd, "% 19.8lf\t", 0.5*k*x*x);
+        for(i=0; i<numberofeigenstates; ++i){
+            fprintf(fd, "%15.8lf\t", psi[i] + (0.5+(double)i)*eval);
+        }
         fprintf(fd, "\n");
     }
     fclose(fd);
