@@ -165,22 +165,17 @@ int main(int argc, char **argv){
     fprintf(fd, "#hermite-argument: %+18.12e 1/angstrom\n", term2);
     fprintf(fd, "#exponent:         %+18.12e 1/angstrom^2\n", term3);
 
-    fprintf(fd, "#energy:\n");
+    if(kcal_flag == 1)  fprintf(fd, "# Energies in kcal/mol:\n");
+    else                fprintf(fd, "# Energies in kJ/mol:\n");
+    
     for(i=0; i<numberofeigenstates; ++i){
-        if(kcal_flag == 1){
-            fprintf(fd, "#\tE%2d = %18.12lf kcal/mol\n", i, (0.5+i)*eval);
-        }
-        else{
-            fprintf(fd, "#\tE%2d = %18.12lf kJ/mol\n"  , i, (0.5+i)*eval);
-        }
+            fprintf(fd, "#\tE%2d = % 20.12lf\n", i, (0.5+i)*eval);
     }
 
     // Calculate E+Psi and output data
-    //fprintf(fd, "# x\tV(x)\tE0+Psi0\tE1+Psi1...\tEn+Psin\n");
-    fprintf(fd, "#  x\t\t");
-    fprintf(fd, " V(x)\t\t\t");
+    fprintf(fd, "#           x                     V          ");
     for(i=0; i<numberofeigenstates; ++i){
-        fprintf(fd, " E%d+Psi%d\t", i,i);
+        fprintf(fd, "      E%2d + Psi%2d     ", i, i);
     }
     fprintf(fd, "\n");
     for(x = xmin; x <= xmax; x += dx){
@@ -197,14 +192,14 @@ int main(int argc, char **argv){
             psi[i] = term1 * 1.0/sqrt(pow(2,i) * (double)factorial(i)) * H[i] * exp(term3*x*x);
         }
 
-        fprintf(fd,  "% 8.8lf\t", x);
+        fprintf(fd,  "% 20.12lf  ", x);
         if(kcal_flag == 1){
-            fprintf(fd, "% 19.8lf\t", 0.5*k*x*x/4.184);
+            fprintf(fd, "% 20.12lf  ", 0.5*k*x*x/4.184);
         }else{
-            fprintf(fd, "% 19.8lf\t", 0.5*k*x*x);
+            fprintf(fd, "% 20.12lf  ", 0.5*k*x*x);
         }
         for(i=0; i<numberofeigenstates; ++i){
-            fprintf(fd, "%15.8lf\t", psi[i] + (0.5+(double)i)*eval);
+            fprintf(fd, "% 20.12lf  ", psi[i] + (0.5+(double)i)*eval);
         }
         fprintf(fd, "\n");
     }
