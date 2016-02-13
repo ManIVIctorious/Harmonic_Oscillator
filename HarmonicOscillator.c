@@ -160,10 +160,13 @@ int main(int argc, char **argv){
         eval = eval/4.184;
     }
 
-    fprintf(fd, "#omega:            %+18.12e 1/s\n", omega);
-    fprintf(fd, "#prefactor:        %+18.12e 1/sqrt(angstrom)\n", term1);
-    fprintf(fd, "#hermite-argument: %+18.12e 1/angstrom\n", term2);
-    fprintf(fd, "#exponent:         %+18.12e 1/angstrom^2\n", term3);
+    fprintf(fd, "# Harmonic Oscillator\n");
+    fprintf(fd, "#  V(x) = 0.5*k*(x-x0)^2 = 0.5*mu*omega^2*(x-x0)^2\n");
+    fprintf(fd, "# omega:            %+18.12e 1/s\n", omega);
+    fprintf(fd, "# reduced mass:     %+18.12e g/mol\n", mu);
+    fprintf(fd, "# prefactor:        %+18.12e 1/sqrt(angstrom)\n", term1);
+    fprintf(fd, "# hermite-argument: %+18.12e 1/angstrom\n", term2);
+    fprintf(fd, "# exponent:         %+18.12e 1/angstrom^2\n", term3);
 
     if(kcal_flag == 1)  fprintf(fd, "# Energies in kcal/mol:\n");
     else                fprintf(fd, "# Energies in kJ/mol:\n");
