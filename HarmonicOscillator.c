@@ -9,13 +9,13 @@ int factorial(int n);
 int main(int argc, char **argv){
 
     // dynamic variables
-    double xmin   =   -2.5;   // minimal x-value, set with -a or --xmin
-    double xmax   =    2.5;   // maximal x-value, set with -b or --xmax
-    double dx     =    0.025; // stepsize of x,   set with -d or --x-spacing
-    double k      = 4587.756; // force-constant in kJ/mol/angstrom^2, set with -k or --force-constant
-    double mu     =    1.0;   // reduced mass of involved particles in g/mol, set with -m or --reduced-mass
+    double xmin   =   -2.5;            // minimal x-value, set with -a or --xmin
+    double xmax   =    2.5;            // maximal x-value, set with -b or --xmax
+    double dx     =    0.025;          // stepsize of x,   set with -d or --x-spacing
+    double k      = 4594.109225112563; // force-constant in kJ/mol/angstrom^2, set with -k or --force-constant
+    double mu     =    1.0;            // reduced mass of involved particles in g/mol, set with -m or --reduced-mass
     char *outputfile = "/dev/stdout";
-    static int kcal_flag = 0; // set flag to kcal/mol
+    static int kcal_flag = 0;          // set flag to kcal/mol
     int numberofeigenstates=6;
 
     int c;
