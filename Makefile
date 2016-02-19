@@ -1,15 +1,14 @@
 # Compiler
 CC = gcc
 # Compilerflags
-CFLAGS = -g03 -Wall -Werror -Wstrict-prototypes -Wmissing-prototypes -mtune=native -I../include
-#CFLAGS = -g03 -Wall -Wno-unused-but-set-variable -Werror -Wstrict-prototypes -Wmissing-prototypes -mtune=native -I../include
+CFLAGS = -g03 -Wall -Werror -Wstrict-prototypes -Wmissing-prototypes -mtune=native
 # Zu erstellende fertige Programme (mit relativem Pfad vorangestellt)
-EXE = HarmonicOscillator.bin
+EXE = ../../bin/HarmonicOscillator
 # Objektdateien (.o bzw. .out), Librarys und Abhängigkeiten
 # (wenn Abhängigkeit geändert -> make wird neu ausgeführt)
 OBJ1 = HarmonicOscillator.o
-LIB1 = -lm `pkg-config --cflags --libs gsl` #../include/differential.c
-DEP1 = HarmonicOscillator.c Makefile #../include/header.h 
+DEP1 = HarmonicOscillator.c Makefile
+LIB1 = -lm `pkg-config --cflags --libs gsl`
 # Kommandoblock "all:" als Einsprungspunkt für make
 all: $(EXE)
 #
