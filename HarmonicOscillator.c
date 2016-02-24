@@ -172,13 +172,13 @@ int main(int argc, char **argv){
     else                fprintf(fd, "# Energies in kJ/mol:\n");
     
     for(i=0; i<numberofeigenstates; ++i){
-            fprintf(fd, "#\tE%2d = % 20.12lf\n", i, (0.5+i)*eval);
+            fprintf(fd, "#\tE%02d = % 26.18lf\n", i, (0.5+i)*eval);
     }
 
     // Calculate E+Psi and output data
     fprintf(fd, "#           x                     V          ");
     for(i=0; i<numberofeigenstates; ++i){
-        fprintf(fd, "      E%2d + Psi%2d     ", i, i);
+        fprintf(fd, "      E%02d + Psi%02d     ", i, i);
     }
     fprintf(fd, "\n");
     for(x = xmin; x <= xmax; x += dx){
@@ -195,14 +195,14 @@ int main(int argc, char **argv){
             psi[i] = term1 * 1.0/sqrt(pow(2,i) * (double)factorial(i)) * H[i] * exp(term3*x*x);
         }
 
-        fprintf(fd,  "% 20.12lf  ", x);
+        fprintf(fd,  "% 26.18lf  ", x);
         if(kcal_flag == 1){
-            fprintf(fd, "% 20.12lf  ", 0.5*k*x*x/4.184);
+            fprintf(fd, "% 26.18lf  ", 0.5*k*x*x/4.184);
         }else{
-            fprintf(fd, "% 20.12lf  ", 0.5*k*x*x);
+            fprintf(fd, "% 26.18lf  ", 0.5*k*x*x);
         }
         for(i=0; i<numberofeigenstates; ++i){
-            fprintf(fd, "% 20.12lf  ", psi[i] + (0.5+(double)i)*eval);
+            fprintf(fd, "% 26.18lf  ", psi[i] + (0.5+(double)i)*eval);
         }
         fprintf(fd, "\n");
     }
