@@ -176,9 +176,9 @@ int main(int argc, char **argv){
     }
 
     // Calculate E+Psi and output data
-    fprintf(fd, "#           x                     V          ");
+    fprintf(fd, "#              x                        V             ");
     for(i=0; i<numberofeigenstates; ++i){
-        fprintf(fd, "      E%02d + Psi%02d     ", i, i);
+        fprintf(fd, "         E%02d + Psi%02d        ", i, i);
     }
     fprintf(fd, "\n");
     for(x = xmin; x <= xmax; x += dx){
