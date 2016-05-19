@@ -127,8 +127,8 @@ int main(int argc, char **argv){
 
     // constants
     pi       = 3.14159265358979323846;
-    hbar     = 1.05457180013E-34;       // Js
-    avogadro = 6.02214085774E23;        // 1/mol
+    hbar     = 1.054571800E-34;         // Js
+    avogadro = 6.022140857E23;          // 1/mol
     amu      = 1.66053904020E-27;       // kg/(g/mol)   1/1000/avogadro
     
     // Psi(n,x) = (mu*omega/pi/hbar)^(1/4)      // term1
