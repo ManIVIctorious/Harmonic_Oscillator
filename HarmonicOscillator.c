@@ -129,7 +129,7 @@ int main(int argc, char **argv){
     pi       = 3.14159265358979323846;
     hbar     = 1.054571800E-34;         // Js
     avogadro = 6.022140857E23;          // 1/mol
-    amu      = 1.66053904020E-27;       // kg/(g/mol)   1/1000/avogadro
+    amu      = 1.660539040E-27;         // kg/(g/mol) <=> 1/1000/avogadro
     
     // Psi(n,x) = (mu*omega/pi/hbar)^(1/4)      // term1
     //            * 1/sqrt(n!*2^n)*
