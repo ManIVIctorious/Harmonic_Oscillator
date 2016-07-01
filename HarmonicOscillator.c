@@ -16,13 +16,15 @@ int main(int argc, char **argv){
     double mu     =    1.0;            // reduced mass of involved particles in g/mol, set with -m or --reduced-mass
     char *outputfile = "/dev/stdout";
     static int kcal_flag = 0;          // set flag to kcal/mol
+    static int evecs_flag = 0;
     int numberofeigenstates=6;
 
     int c;
     while(1){
         static struct option long_options[] = {
             /* These options set a flag. */
-            {"kcal", no_argument, &kcal_flag, 1},
+            {"kcal" , no_argument, &kcal_flag , 1},
+            {"evecs", no_argument, &evecs_flag, 1},
             /* These options don’t set a flag.
                We distinguish them by their indices. */
             {"help",                  no_argument, 0, 'h'},
@@ -70,7 +72,7 @@ int main(int argc, char **argv){
                 printf("\n\t\t\t");
                 printf("[--number-of-eigenstates|-n]");
                 printf("\n\n");
-                
+
                 printf("-h, --help\t\t\tShow this help dialogue\n");
                 printf("-a, --xmin\t\t\tSet minimum x-value\n");
                 printf("-b, --xmax\t\t\tSet maximum x-value\n");
@@ -80,6 +82,7 @@ int main(int argc, char **argv){
                 printf("-o, --output-file\t\tName of output file\n");
                 printf("-n, --number-of-eigenstates\tNumber of calculated eigenstates\n");
                 printf("    --kcal\t\t\tOutput in kcal/mol\n");
+                printf("    --evecs\t\t\tOutput eigenvectors directly (don't add evals)");
                 printf("\n");
                 exit (0);
 
@@ -118,19 +121,19 @@ int main(int argc, char **argv){
     }
 
     int i;
-    double pi, hbar, avogadro, amu, x;
-    double omega, term1, term2, term3, arg, eval; 
+    double x;
+    double omega, term1, term2, term3, arg, eval;
 
     double H[numberofeigenstates];
     double psi[numberofeigenstates];
     FILE *fd = fopen(outputfile, "w");
 
     // constants
-    pi       = 3.14159265358979323846;
-    hbar     = 1.054571800E-34;         // Js
-    avogadro = 6.022140857E23;          // 1/mol
-    amu      = 1.660539040E-27;         // kg/(g/mol) <=> 1/1000/avogadro
-    
+    double pi       = 3.1415926535897932384626433832795;
+    double planck   = 6.626070040E-34;      // Js
+    double avogadro = 6.022140857E23;       // 1/mol
+    double amu      = 1/(1000*avogadro);    // kg/(g/mol) <=> 1/1000/avogadro
+
     // Psi(n,x) = (mu*omega/pi/hbar)^(1/4)      // term1
     //            * 1/sqrt(n!*2^n)*
     //            * H_n(sqrt(mu*omega/hbar)*x)  // H_n(term2*x)
@@ -142,19 +145,19 @@ int main(int argc, char **argv){
 
     // term1^4 = mu g/mol * omega 1/s * hbar 1/(J*s) * amu kg/(g/mol) / 10^20 m^2/angstrom^2
     //         = 10^-20*amu * mu*omega/pi/hbar 1/angstrom^2
-    term1 = 1.0E-5*pow(mu*amu*omega/pi/hbar, 0.25); // 1/sqrt(angstrom)
-    
+    term1 = 1.0E-5*pow(2.0*mu*amu*omega/planck, 0.25); // 1/sqrt(angstrom)
+
     // term2^2 = mu g/mol * omega 1/s * hbar 1/(J*s) * amu kg/(g/mol) / 10^20 m^2/angstrom^2
     //         = 10^-20*amu * mu*omega/hbar 1/angstrom^2
-    term2 = 1.0E-10*sqrt(mu*amu*omega/hbar);        // 1/angstrom
+    term2 = 1.0E-10*sqrt(mu*amu*omega*2.0*pi/planck); // 1/angstrom
 
     // term3   = mu g/mol * omega 1/s * hbar 1/(J*s) * amu kg/(g/mol) / 10^20 m^2/angstrom^2
     //         = 10^-20*amu * -mu*omega/2/hbar 1/angstrom^2
-    term3 = -1.0E-20*mu*amu*omega/2.0/hbar;         // 1/angstrom^2
+    term3 = -1.0E-20*mu*amu*omega*pi/planck;         // 1/angstrom^2
 
     // analytical eigenvalues
     // eval    = hbar J*s * omega 1/s * avogadro 1/mol / 1000 kJ/J
-    eval = hbar*omega*avogadro/1000.0;              // kJ/mol
+    eval = planck/pi*omega*avogadro/2000.0;         // kJ/mol
 
     if(kcal_flag == 1){
         eval = eval/4.184;
@@ -170,9 +173,9 @@ int main(int argc, char **argv){
 
     if(kcal_flag == 1)  fprintf(fd, "# Energies in kcal/mol:\n");
     else                fprintf(fd, "# Energies in kJ/mol:\n");
-    
+
     for(i=0; i<numberofeigenstates; ++i){
-            fprintf(fd, "#\tE%02d = % 26.18lf\n", i, (0.5+i)*eval);
+            fprintf(fd, "#\tE%02d = % 26.20lf\n", i, (0.5+i)*eval);
     }
 
     // Calculate E+Psi and output data
@@ -184,7 +187,7 @@ int main(int argc, char **argv){
     for(x = xmin; x <= xmax; x += dx){
 
         arg = term2*x;
-        
+
         // H(n,x) = (-1)^n * e^(x^2) * d^n/dx^n e^(-x^2)
         H[0] = 1;
         H[1] = 2*arg;
@@ -195,16 +198,24 @@ int main(int argc, char **argv){
             psi[i] = term1 * 1.0/sqrt(pow(2,i) * (double)factorial(i)) * H[i] * exp(term3*x*x);
         }
 
-        fprintf(fd,  "% 26.18lf  ", x);
+        fprintf(fd,  "% 26.20lf  ", x);
         if(kcal_flag == 1){
-            fprintf(fd, "% 26.18lf  ", 0.5*k*x*x/4.184);
+            fprintf(fd, "% 26.20lf  ", 0.5*k*x*x/4.184);
         }else{
-            fprintf(fd, "% 26.18lf  ", 0.5*k*x*x);
+            fprintf(fd, "% 26.20lf  ", 0.5*k*x*x);
         }
-        for(i=0; i<numberofeigenstates; ++i){
-            fprintf(fd, "% 26.18lf  ", psi[i] + (0.5+(double)i)*eval);
+
+        if(evecs_flag == 0){
+            for(i=0; i<numberofeigenstates; ++i){
+                fprintf(fd, "% 26.20lf  ", psi[i] + (0.5+(double)i)*eval);
+            }
+            fprintf(fd, "\n");
+        } else{
+            for(i=0; i<numberofeigenstates; ++i){
+                fprintf(fd, "% 26.20lf  ", psi[i]);
+            }
+            fprintf(fd, "\n");
         }
-        fprintf(fd, "\n");
     }
     fclose(fd);
 
