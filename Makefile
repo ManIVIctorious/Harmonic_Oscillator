@@ -1,19 +1,27 @@
-# Compiler
-CC = gcc
-# Compilerflags
-CFLAGS = -g03 -Wall -Werror -Wstrict-prototypes -Wmissing-prototypes -mtune=native
-# Zu erstellende fertige Programme (mit relativem Pfad vorangestellt)
-EXE = ../../bin/HarmonicOscillator
-# Objektdateien (.o bzw. .out), Librarys und Abhängigkeiten
-# (wenn Abhängigkeit geändert -> make wird neu ausgeführt)
-OBJ1 = HarmonicOscillator.o
-DEP1 = HarmonicOscillator.c Makefile
-LIB1 = -lm `pkg-config --cflags --libs gsl`
-# Kommandoblock "all:" als Einsprungspunkt für make
+# Compiler and Compilerflags
+  CC = gcc
+# List of compiler flags
+  CFLAGS = -O2 -Wall -Wextra -Werror -march=native
+
+# Resulting executable
+  EXEDIR = $(if ${MyLocalPath}, ${MyLocalPath}, bin)
+  EXE = $(EXEDIR)/harmonic-oscillator
+
+
+# List of linked libraries
+  LIB = -lm `pkg-config --cflags --libs gsl`
+
+# List of resulting object files
+  OBJ += HarmonicOscillator.o
+
 all: $(EXE)
-#
-$(EXE): $(OBJ1) $(DEP1)
-	$(CC) $(CFLAGS) $(OBJ1) $(LIB1) -o $@
+# define rule to build object files out of C-source files
+%.o: %.c
+	$(CC) $(CFLAGS) -c $<
+
+# link all objects to create the executable
+$(EXE): $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) $(LIB) -o $@
 
 clean:
-	rm $(OBJ1) $(EXE)
+	rm -f $(OBJ) $(EXE)
