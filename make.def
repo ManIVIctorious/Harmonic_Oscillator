@@ -1,0 +1,13 @@
+# Executable name
+  EXENAME = harmonic-oscillator
+
+# Additional libraries, includes and packages
+  LIB      = -lm
+  INC      = 
+  PACKAGES = 
+
+# Preprocessor flags
+  PPF = 
+
+# Source Files
+  SRC += HarmonicOscillator.c
